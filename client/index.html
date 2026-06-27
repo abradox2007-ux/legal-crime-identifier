@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Case Lens — Describe it. Find the law.</title>
+    <meta
+      name="description"
+      content="Describe an incident in plain language and get the likely matching law, article and section."
+    />
+    <meta name="theme-color" content="#16213A" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Case Lens" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      // Apply theme before paint to avoid a flash of the wrong theme.
+      (function () {
+        const stored = localStorage.getItem("case-lens-theme");
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const theme = stored || (prefersDark ? "dark" : "light");
+        if (theme === "dark") document.documentElement.classList.add("dark");
+      })();
+    </script>
+  </head>
+  <body class="bg-ink-50 dark:bg-ink-950">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

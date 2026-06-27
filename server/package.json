@@ -1,0 +1,20 @@
+{
+  "name": "crime-identifier-server",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Express API that turns a casual crime description into a matched law, article and section using an open-source LLM (via Groq).",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node --watch index.js",
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
