@@ -65,7 +65,7 @@ router.post("/", async (req, res) => {
   if (!apiKey) {
     return res.status(400).json({
       error: "api_key_missing",
-      message: "Groq API Key is missing. Please click the Settings icon (gear) in the top-right corner to configure your API key.",
+      message: "Groq API Key is missing. Please configure GROQ_API_KEY in the server environment.",
     });
   }
 

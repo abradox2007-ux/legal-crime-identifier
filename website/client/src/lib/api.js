@@ -9,12 +9,10 @@ const API_URL = import.meta.env.VITE_API_URL !== undefined
  */
 export async function analyzeCrime(description) {
   try {
-    const customApiKey = localStorage.getItem("case-lens-groq-key") || "";
     const res = await fetch(`${API_URL}/api/analyze`, {
       method: "POST",
       headers: { 
-        "Content-Type": "application/json",
-        "X-Groq-API-Key": customApiKey
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({ description }),
     });

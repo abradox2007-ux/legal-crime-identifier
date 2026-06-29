@@ -5,7 +5,6 @@ import LoadingSkeleton from "./components/LoadingSkeleton.jsx";
 import ResultCard from "./components/ResultCard.jsx";
 import ErrorMessage from "./components/ErrorMessage.jsx";
 import ConstitutionIndex from "./components/ConstitutionIndex.jsx";
-import SettingsModal from "./components/SettingsModal.jsx";
 import { useTheme } from "./hooks/useTheme.js";
 import { analyzeCrime } from "./lib/api.js";
 
@@ -16,7 +15,7 @@ export default function App() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [lastDescription, setLastDescription] = useState("");
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
 
   const runAnalysis = async (description) => {
     setLastDescription(description);
@@ -40,9 +39,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-ink-50 dark:bg-ink-950 transition-colors duration-200">
-      <Header theme={theme} onToggleTheme={toggleTheme} onOpenSettings={() => setIsSettingsOpen(true)} />
-
-      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+      <Header theme={theme} onToggleTheme={toggleTheme} />
 
       <main className="mx-auto max-w-2xl px-6 pb-20">
         {/* Navigation Tabs */}
