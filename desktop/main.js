@@ -6,7 +6,9 @@ let mainWindow;
 let serverProcess;
 
 function startBackendServer() {
-  const serverPath = path.join(__dirname, "server", "index.js");
+  const serverPath = app.isPackaged
+    ? path.join(__dirname, "server", "index.js")
+    : path.join(__dirname, "..", "website", "server", "index.js");
   
   // Fork the Express backend as a separate process using Electron's Node runtime
   serverProcess = fork(serverPath, [], {
@@ -28,13 +30,17 @@ function startBackendServer() {
 }
 
 function createWindow() {
+  const iconPath = app.isPackaged
+    ? path.join(__dirname, "client", "public", "icon-192.png")
+    : path.join(__dirname, "..", "website", "client", "public", "icon-192.png");
+
   mainWindow = new BrowserWindow({
     width: 1000,
     height: 800,
     minWidth: 800,
     minHeight: 600,
     title: "Case Lens",
-    icon: path.join(__dirname, "client", "public", "icon-192.png"),
+    icon: iconPath,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true

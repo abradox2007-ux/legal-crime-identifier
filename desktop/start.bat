@@ -1,9 +1,9 @@
 @echo off
 :: Launch the backend server minimized
-start /min "Crime Identifier - Server" cmd /c "cd server && npm run dev"
+start /min "Crime Identifier - Server" cmd /c "cd ../website/server && npm run dev"
 
 :: Launch the frontend client minimized
-start /min "Crime Identifier - Client" cmd /c "cd client && npm run dev"
+start /min "Crime Identifier - Client" cmd /c "cd ../website/client && npm run dev"
 
 :: Wait 3 seconds for the development servers to initialize
 timeout /t 3 /nobreak >nul

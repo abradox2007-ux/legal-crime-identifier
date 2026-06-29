@@ -1,0 +1,25 @@
+{
+  "name": "case-lens-desktop",
+  "version": "1.0.0",
+  "main": "main.js",
+  "description": "Desktop executable application of Case Lens legal crime identifier",
+  "author": "Case Lens Team",
+  "scripts": {
+    "dev:client": "npm --prefix ../website/client run dev",
+    "build:client": "npm --prefix ../website/client run build",
+    "dev:server": "npm --prefix ../website/server run dev",
+    "start": "electron .",
+    "prepackage": "powershell -Command \"Remove-Item -Recurse -Force -ErrorAction SilentlyContinue client, server; Copy-Item -Recurse ../website/client . ; Copy-Item -Recurse ../website/server .\"",
+    "package": "npm run build:client && npm run prepackage && electron-packager . \"Case Lens\" --platform=win32 --arch=x64 --out=dist-desktop --overwrite --ignore=\"client/(src|node_modules|public|tailwind.config.js|postcss.config.js)\" --ignore=\"dist-desktop\" --ignore=\"\\.git\" && powershell -Command \"Remove-Item -Recurse -Force client, server\""
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0"
+  },
+  "devDependencies": {
+    "electron": "^31.1.0",
+    "electron-packager": "^17.1.2"
+  }
+}

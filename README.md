@@ -1,97 +1,70 @@
-# Case Lens
+# Case Lens — Legal Crime Identifier
 
-Describe a crime or incident in plain, casual language and get back the likely matching law,
-article, and section — for informational triage, not formal legal advice.
+Describe a crime or incident in plain, casual language and get back the likely matching law, article, and section — for informational triage, not formal legal advice.
+
+## Repository Layout
+
+This project is separated into two isolated, self-contained modules:
 
 ```
 legal-crime-identifier/
-├── server/        Express API — calls the LLM, validates its JSON, serves /api/analyze
-│   ├── index.js
-│   ├── routes/analyze.js
-│   └── prompts/systemPrompt.js   ← the system prompt; edit this to change jurisdiction/behavior
-└── client/        Vite + React + Tailwind frontend
-    └── src/
-        ├── App.jsx
-        ├── components/            CrimeInputForm, ResultCard, LoadingSkeleton, ErrorMessage, ThemeToggle
-        ├── hooks/useTheme.js
-        └── lib/api.js
+├── website/                   # Everything needed to publish to a web domain
+│   ├── client/                # Vite + React + Tailwind frontend
+│   ├── server/                # Express API backend (Groq LLM calls)
+│   └── package.json           # Unified web scripts for deployment
+└── desktop/                   # Standalone desktop executable wrapper
+    ├── main.js                # Electron process controller
+    ├── package.json           # Packaging & build scripts
+    ├── start.bat / stop.bat   # Local development launchers
+    └── dist-desktop/          # Output directory for Windows EXE
 ```
 
-## 1. Get an API key (free)
+---
 
-This uses [Groq](https://console.groq.com) to run open-source models (Llama 3.3, etc.) — it's
-free to start and very fast. Create an API key at https://console.groq.com/keys.
+## 🌐 1. Web Domain Publishing (`website/`)
 
-> **Want fully local instead?** Skip the API key and run [Ollama](https://ollama.com) locally
-> (`ollama pull llama3.1` then `ollama serve`). Ollama exposes an OpenAI-compatible endpoint at
-> `http://localhost:11434/v1/chat/completions`. In `server/routes/analyze.js`, change `GROQ_URL`
-> to that address and drop the `Authorization` header — everything else works unchanged.
+The `website/` directory contains both the frontend and backend ready for cloud hosting.
 
-## 2. Run the backend
-
+### Quick Start (Local Web Server)
 ```bash
-cd server
-cp .env.example .env
-# paste your key into .env as GROQ_API_KEY=...
-npm install
-npm run dev
+cd website
+npm run build
+npm start
 ```
+The server binds to port 5000 and statically serves the React frontend production build.
 
-The API starts on `http://localhost:5000`. Check it with `curl http://localhost:5000/api/health`.
+### Deployment Instructions
+For step-by-step instructions on publishing your site to a live domain using hosting platforms like Render or Railway, see [Walkthrough & Publishing Guide](file:///C:/Users/Abinesh/.gemini/antigravity-ide/brain/939b1108-f37b-4f2d-9213-41ab3406768b/walkthrough.md).
 
-## 3. Run the frontend
+---
 
+## 💻 2. Desktop Application (`desktop/`)
+
+The `desktop/` directory packages the application as a native Windows desktop executable using Electron.
+
+### Running locally
+Run `desktop/start.bat` or execute:
 ```bash
-cd client
-cp .env.example .env   # only needed if your API isn't on localhost:5000
-npm install
-npm run dev
+cd desktop
+npm start
 ```
 
-Open `http://localhost:5173`.
-
-## How it works
-
-1. The user types a casual description into the textarea (`CrimeInputForm`).
-2. The frontend POSTs `{ description }` to `POST /api/analyze`.
-3. The backend sends a system prompt + the description to the LLM via Groq's
-   OpenAI-compatible `/v1/chat/completions` endpoint, with `response_format: json_object`
-   so the model is constrained to return JSON.
-4. The backend parses and **validates the shape** of the JSON before trusting it (see
-   `validateShape` in `routes/analyze.js`) and retries once automatically if the first
-   attempt fails or returns malformed JSON.
-5. The fixed disclaimer text is attached server-side (never trusted to the model), and the
-   result is returned to the frontend.
-6. `ResultCard` renders one of three states the model can return:
-   - `matched` — full result card with category, law, article/chapter, section, explanation,
-     confidence badge, and any secondary offenses worth noting.
-   - `unclear` — the description didn't have enough detail; shows one clarifying question.
-   - `not_legal_matter` — the text wasn't describing a criminal incident at all.
-
-## Customizing the jurisdiction
-
-By default the prompt targets Indian law (Bharatiya Nyaya Sanhita, 2023 — the code that
-replaced the IPC in 2024). To target a different country, set `LEGAL_JURISDICTION` in
-`server/.env`, e.g.:
-
+### Packaging into `.exe`
+```bash
+cd desktop
+npm run package
 ```
-LEGAL_JURISDICTION=United Kingdom
-LEGAL_JURISDICTION=California, USA
+The packaged application will be generated in `desktop/dist-desktop/`.
+
+---
+
+## Environment Configuration
+
+Both web and desktop environments require a `GROQ_API_KEY` set in `website/server/.env` (or set as a cloud environment variable):
+
+```env
+GROQ_API_KEY=your_groq_api_key_here
+LEGAL_JURISDICTION=India
 ```
 
-The prompt in `server/prompts/systemPrompt.js` instructs the model to cite that
-jurisdiction's real, currently-in-force statute rather than inventing one. For production use
-with a specific jurisdiction, consider grounding answers further with retrieval over an actual
-statute database rather than relying on model knowledge alone — model knowledge of exact
-section numbers can be wrong, which is why the UI always shows a confidence level and the
-disclaimer.
-
-## Notes on this being an MVP, not a legal product
-
-- The model can still get specific section numbers wrong — that's why every result carries a
-  confidence level and a disclaimer, and why `additional_sections` exists rather than forcing
-  a single "correct" answer.
-- There's no database here — nothing is persisted. Add one (e.g. Postgres + Prisma) if you
-  want history, accounts, or analytics.
-- Rate limiting is in-memory (`express-rate-limit`) and resets on server restart; swap in a
-  Redis-backed store before deploying somewhere with multiple instances.
+Get a free API key at [console.groq.com](https://console.groq.com/keys).
