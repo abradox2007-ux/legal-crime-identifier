@@ -106,9 +106,10 @@ router.post("/", async (req, res) => {
     try {
       raw = await callGroq();
     } catch (firstErr) {
-      // One retry — transient API hiccups and the rare malformed-JSON reply
-      // are common enough with LLMs to deserve a single automatic retry.
-      console.warn("First analyze attempt failed, retrying once:", firstErr.message);
+      console.warn("First analyze attempt failed:", firstErr.message);
+      if (firstErr.message.includes("401") || firstErr.message.includes("403")) {
+        throw firstErr;
+      }
       raw = await callGroq();
     }
 
@@ -123,10 +124,26 @@ router.post("/", async (req, res) => {
     return res.json(parsed);
   } catch (err) {
     console.error("Analyze failed:", err.message);
+
+    if (err.message.includes("401") || err.message.includes("invalid_api_key")) {
+      return res.status(401).json({
+        error: "invalid_api_key",
+        message: "Invalid Groq API Key. Please check the GROQ_API_KEY configured in your environment variables.",
+      });
+    }
+
+    if (err.message.includes("429") || err.message.includes("rate_limit")) {
+      return res.status(429).json({
+        error: "groq_rate_limit",
+        message: "Groq API rate limit or quota exceeded. Please wait a moment and try again.",
+      });
+    }
+
     return res.status(502).json({
       error: "analysis_failed",
       message:
-        "The assistant couldn't produce a confident match this time. Try adding a bit more detail (what happened, where, and roughly when) and submit again.",
+        "The assistant was unable to complete the analysis. " +
+        (err.message.includes("Groq API error") ? err.message : "Please check your description and try again."),
     });
   }
 });
